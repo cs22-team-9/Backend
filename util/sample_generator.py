@@ -6,8 +6,8 @@
 # to see the world.
 
 from django.contrib.auth.models import User
+from adventure.models import Player, Room
 from random import randint
-
 
 class Room:
     def __init__(self, id, name, description, x, y):
@@ -103,8 +103,6 @@ class World:
         start_y = randint(0,size_y)
         # Create Starting Room
         self.start = self.start_room(start_x, start_y)
-        # Save Start Room
-        self.start.save()
         # Previous Room Object for Loop
         selected_room = self.start
         # Loops through to create the rest of n-1 rooms
@@ -135,8 +133,6 @@ class World:
                     # Connect the rooms
                     new_room.connect_rooms(selected_room, direction)
                     # Add to room list
-                    new_room.save()
-                    # Append rooms attribute
                     self.rooms.append(new_room)
                     # Roll for another room list index
                     room_roll = randint(0,len(self.rooms)-1)
@@ -157,12 +153,10 @@ class World:
         
         # Make exit
         self.exit_room(self.rooms[-1])
-        self.exit.save()
 
         # Make Key Room
         i = int(self.room_count * 0.66667)
-        self.make_key_room(self.rooms[i])  
-        self.key_room.save()  
+        self.make_key_room(self.rooms[i])   
 
     def print_rooms(self):
         '''
@@ -217,6 +211,22 @@ class World:
 
         # Print string
         print(str)
+
+
+# Refresh the rooms
+Room.objects.all().delete()
+
+w = World()
+w.generate_world(10,10, 50)
+
+rooms = Room.objects.all()
+for r in rooms:
+    r.save()
+
+players=Player.objects.all()
+for p in players:
+    p.currentRoom=w.start.id
+    p.save()
 
 # w = World()
 # w.generate_world(33,33, 1000)
