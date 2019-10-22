@@ -5,6 +5,7 @@
 # procedural generation algorithm and use print_rooms()
 # to see the world.
 
+from django.contrib.auth.models import User
 from random import randint
 
 
@@ -19,6 +20,7 @@ class Room:
         self.w_to = None
         self.x = x
         self.y = y
+        self.key = False
     def __repr__(self):
         if self.e_to is not None:
             return f"({self.x}, {self.y}) -> ({self.e_to.x}, {self.e_to.y})"
@@ -36,11 +38,6 @@ class Room:
         Connect two rooms in the given n/s/e/w direction
         '''
         return getattr(self, f"{direction}_to")
-    def check_adjacent_rooms(self):
-        """
-        Checks each adjacent tile to see if there is a room there
-        """
-        pass
 
 class World:
     def __init__(self):
@@ -49,6 +46,9 @@ class World:
         self.height = 0
         self.room_count = 0
         self.rooms = []
+        self.start = None
+        self.exit = None
+        self.key_room = None
 
     def generate_blank_matrix(self, size_x, size_y):
         # initialize the grid
@@ -66,7 +66,20 @@ class World:
         self.grid[start_room.x][start_room.y] = start_room
         self.room_count += 1
 
+        self.start = start_room
+
         return start_room
+
+    def exit_room(self, room):
+        room.name = 'Exit'
+        room.description = 'You have reached the Exit'
+        self.exit = room
+
+    def make_key_room(self, room):
+        room.name = 'Key Room'
+        room.description = 'A golden key sits in front of you'
+        room.key = True
+        self.key_room = room
 
     def add_room(self,id, x, y):
         """
@@ -89,14 +102,18 @@ class World:
         start_x = randint(0,size_x)
         start_y = randint(0,size_y)
         # Create Starting Room
-        selected_room = self.start_room(start_x, start_y)
-
+        self.start = self.start_room(start_x, start_y)
+        # Save Start Room
+        self.start.save()
+        # Previous Room Object for Loop
+        selected_room = self.start
+        # Loops through to create the rest of n-1 rooms
         while self.room_count < n_rooms:
             y_val = selected_room.y
             x_val = selected_room.x
-
+            # dice roll to pick a direciton
             dir_roll = randint(0,3)
-
+            # Roll Logic
             if dir_roll == 0:
                 x_val += 1
                 direction = 's'
@@ -110,27 +127,42 @@ class World:
                 y_val -=1
                 direction = 'e'
 
+            # Make sure we are in bounds
             if 0 <= x_val < size_x and 0 <= y_val < size_y:
-
+                # Make sure the space isn't occupied
                 if self.grid[x_val][y_val] is None:    
                     new_room = self.add_room(self.room_count+1, x_val, y_val)
-
+                    # Connect the rooms
                     new_room.connect_rooms(selected_room, direction)
-                    
+                    # Add to room list
+                    new_room.save()
+                    # Append rooms attribute
                     self.rooms.append(new_room)
-
+                    # Roll for another room list index
                     room_roll = randint(0,len(self.rooms)-1)
-                    
+                    # select next room to branch from
                     selected_room = self.rooms[room_roll]
-                    
+
+                # Try another loop
                 else:
                     room_roll = randint(0,len(self.rooms)-1)
                     selected_room = self.rooms[room_roll]
                     pass
+
+            # Try another loop
             else:
                 room_roll = randint(0,len(self.rooms)-1)
                 selected_room = self.rooms[room_roll]
                 pass
+        
+        # Make exit
+        self.exit_room(self.rooms[-1])
+        self.exit.save()
+
+        # Make Key Room
+        i = int(self.room_count * 0.66667)
+        self.make_key_room(self.rooms[i])  
+        self.key_room.save()  
 
     def print_rooms(self):
         '''
@@ -185,3 +217,7 @@ class World:
 
         # Print string
         print(str)
+
+# w = World()
+# w.generate_world(33,33, 1000)
+# w.print_rooms()
