@@ -40,6 +40,7 @@ class Room:
         """
         Checks each adjacent tile to see if there is a room there
         """
+        pass
 
 class World:
     def __init__(self):
@@ -85,72 +86,51 @@ class World:
         # Create Map
         self.generate_blank_matrix(size_x=size_x, size_y=size_y)
         # Generate Starting Location
-        start_x = randint(0,size_x,)
-        start_y = randint(0,start_y)
+        start_x = randint(0,size_x)
+        start_y = randint(0,size_y)
         # Create Starting Room
-        prev_room = self.start_room()
-        selected_room = prev_room
+        selected_room = self.start_room(start_x, start_y)
 
         while self.room_count < n_rooms:
-            roll = randint(0,3)
-            
+            y_val = selected_room.y
+            x_val = selected_room.x
 
+            dir_roll = randint(0,3)
 
-
-    def generate_zig_zag_rooms(self, size_x, size_y, num_rooms):
-        '''
-        Fill up the grid, bottom to top, in a zig-zag pattern
-        '''
-
-        # Initialize the grid
-        self.grid = [None] * size_y
-        self.width = size_x
-        self.height = size_y
-        for i in range( len(self.grid) ):
-            self.grid[i] = [None] * size_x
-
-        # Start from lower-left corner (0,0)
-        x = -1 # (this will become 0 on the first step)
-        y = 0
-        room_count = 0
-
-        # Start generating rooms to the east
-        direction = 1  # 1: east, -1: west
-
-
-        # While there are rooms to be created...
-        previous_room = None
-        while room_count < num_rooms:
-
-            # Calculate the direction of the room to be created
-            if direction > 0 and x < size_x - 1:
-                room_direction = "e"
-                x += 1
-            elif direction < 0 and x > 0:
-                room_direction = "w"
-                x -= 1
+            if dir_roll == 0:
+                x_val += 1
+                direction = 's'
+            elif dir_roll == 1:
+                x_val -= 1
+                direction = 'n'
+            elif dir_roll == 2:
+                y_val += 1
+                direction = 'w'
             else:
-                # If we hit a wall, turn north and reverse direction
-                room_direction = "n"
-                y += 1
-                direction *= -1
+                y_val -=1
+                direction = 'e'
 
-            # Create a room in the given direction
-            room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
-            # Note that in Django, you'll need to save the room after you create it
+            if 0 <= x_val < size_x and 0 <= y_val < size_y:
 
-            # Save the room in the World grid
-            self.grid[y][x] = room
+                if self.grid[x_val][y_val] is None:    
+                    new_room = self.add_room(self.room_count+1, x_val, y_val)
 
-            # Connect the new room to the previous room
-            if previous_room is not None:
-                previous_room.connect_rooms(room, room_direction)
+                    new_room.connect_rooms(selected_room, direction)
+                    
+                    self.rooms.append(new_room)
 
-            # Update iteration variables
-            previous_room = room
-            room_count += 1
-
-
+                    room_roll = randint(0,len(self.rooms)-1)
+                    
+                    selected_room = self.rooms[room_roll]
+                    
+                else:
+                    room_roll = randint(0,len(self.rooms)-1)
+                    selected_room = self.rooms[room_roll]
+                    pass
+            else:
+                room_roll = randint(0,len(self.rooms)-1)
+                selected_room = self.rooms[room_roll]
+                pass
 
     def print_rooms(self):
         '''
@@ -205,49 +185,3 @@ class World:
 
         # Print string
         print(str)
-
-
-# w = World()
-# num_rooms = 200
-# width = 20
-# height = 10
-# w.generate_zig_zag_rooms(width, height, num_rooms)
-# w.print_rooms()
-
-
-# print(f"\n\nWorld\n  height: {height}\n  width: {width},\n  num_rooms: {num_rooms}\n")
-##########################################################
-
-# from util.sample_generator import *
-# w = World()
-# w.generate_blank_matrix(15,15)
-
-# x = randint(0,w.width)
-# y = randint(0,w.height)
-
-# selected_room = w.start_room(x,y)
-
-# w.print_rooms()
-
-##########################
-
-# y_val = selected_room.y
-# x_val = selected_room.x
-
-# roll = randint(0,3)
-
-# if roll == 0:
-#     x_val += 1
-# elif roll == 1:
-#     x_val -= 1
-# elif roll == 2:
-#     y_val += 1
-# else:
-#     y_val -=1
-    
-# new_room = w.add_room(w.room_count+1, x_val, y_val)
-
-# room_coords=[]
-# room_coords.append([new_room.x, new_room.y])
-
-# w.print_rooms()
