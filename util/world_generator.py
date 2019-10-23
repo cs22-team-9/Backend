@@ -48,7 +48,7 @@ class World:
         self.rooms = []
         self.start = None
         self.exit = None
-        self.key_room = None
+        # self.key_room = None
 
     def generate_blank_matrix(self, size_x, size_y):
         # initialize the grid
@@ -154,6 +154,7 @@ class World:
         self.rooms.insert(0, self.start)
         # Make exit
         self.exit_room(self.rooms[-1])
+        self.exit.save()
 
         # # Make Key Room
         # i = int(self.room_count * 0.66667)

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from adventure.models import Player, Room
 from random import randint
 
+Room.objects.all().delete()
 
 class World:
     def __init__(self):
@@ -32,6 +33,8 @@ class World:
 
         self.start = start_room
 
+        start_room.save()
+
         return start_room
 
     def exit_room(self, room):
@@ -39,11 +42,11 @@ class World:
         room.description = 'You have reached the Exit'
         self.exit = room
 
-    def make_key_room(self, room):
-        room.title = 'Key Room'
-        room.description = 'A golden key sits in front of you'
-        room.key = True
-        self.key_room = room
+    # def make_key_room(self, room):
+    #     room.title = 'Key Room'
+    #     room.description = 'A golden key sits in front of you'
+    #     room.key = True
+    #     self.key_room = room
 
     def add_room(self,id, x, y):
         """
@@ -52,7 +55,9 @@ class World:
         new_room = Room(id, title='new_room',
                         description='An additional room', 
                         x=x, y=y)
+        
         new_room.save()
+
         self.grid[x][y] = new_room
         self.room_count += 1
         return new_room
@@ -62,9 +67,10 @@ class World:
         Generates a map with n number rooms in x and y size
         """
         self.generate_blank_matrix(size_x=size_x, size_y=size_y)
-        start_x = randint(0,size_x)
-        start_y = randint(0,size_y)
-        self.start = self.start_room(start_x, start_y)
+        # start_x = randint(0,size_x)
+        # start_y = randint(0,size_y)
+
+        self.start = self.start_room(0,0)
         selected_room = self.start
         while self.room_count < n_rooms:
             y_val = selected_room.y
@@ -104,6 +110,7 @@ class World:
                 pass
         self.rooms.insert(0, self.start)
         self.exit_room(self.rooms[-1])
+        self.exit.save()
 
         # i = int(self.room_count * 0.66667)
         # self.make_key_room(self.rooms[i])   
@@ -154,10 +161,14 @@ class World:
         print(str)
 
 w = World()
-w.generate_world(10,10, 50)
+w.generate_world(10,10, 100)
 w.print_rooms()
 
-# players=Player.objects.all()
-# for p in players:
-#   p.currentRoom=r_outside.id
-#   p.save()
+players=Player.objects.all()
+for p in players:
+  p.currentRoom=w.start.id
+  p.save()
+print(players, 'players')
+print(p.currentRoom)
+
+
