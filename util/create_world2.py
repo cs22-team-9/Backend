@@ -102,7 +102,7 @@ class World:
                 room_roll = randint(0,len(self.rooms)-1)
                 selected_room = self.rooms[room_roll]
                 pass
-        self.rooms.insert(index=0, object=self.start)
+        self.rooms.insert(0, self.start)
         self.exit_room(self.rooms[-1])
 
         # i = int(self.room_count * 0.66667)

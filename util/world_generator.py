@@ -150,7 +150,8 @@ class World:
                 room_roll = randint(0,len(self.rooms)-1)
                 selected_room = self.rooms[room_roll]
                 pass
-        
+
+        self.rooms.insert(0, self.start)
         # Make exit
         self.exit_room(self.rooms[-1])
 
