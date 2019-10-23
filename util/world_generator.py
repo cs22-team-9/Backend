@@ -5,8 +5,8 @@
 # procedural generation algorithm and use print_rooms()
 # to see the world.
 
-from django.contrib.auth.models import User
-from adventure.models import Player, Room
+#from django.contrib.auth.models import User
+#from adventure.models import Player, Room
 from random import randint
 
 class Room:
@@ -214,19 +214,19 @@ class World:
 
 
 # Refresh the rooms
-Room.objects.all().delete()
+# Room.objects.all().delete()
 
-w = World()
-w.generate_world(10,10, 50)
+# w = World()
+# w.generate_world(10,10, 50)
 
-rooms = Room.objects.all()
-for r in rooms:
-    r.save()
+# rooms = Room.objects.all()
+# for r in rooms:
+#     r.save()
 
-players=Player.objects.all()
-for p in players:
-    p.currentRoom=w.start.id
-    p.save()
+# players=Player.objects.all()
+# for p in players:
+#     p.currentRoom=w.start.id
+#     p.save()
 
 # w = World()
 # w.generate_world(33,33, 1000)
