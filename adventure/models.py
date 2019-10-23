@@ -17,6 +17,10 @@ class Room(models.Model):
     # key = models.BooleanField(default=False)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
+        originRoomID = self.id
+        reverse_dirs = {"n": "s", "s": "n", "e": "w", "w": "e"}
+        reverse_dir = reverse_dirs[direction]
+        
         try:
             destinationRoom = Room.objects.get(id=destinationRoomID)
         except Room.DoesNotExist:
@@ -24,15 +28,22 @@ class Room(models.Model):
         else:
             if direction == "n":
                 self.n_to = destinationRoomID
+                destinationRoom.s_to = originRoomID
             elif direction == "s":
                 self.s_to = destinationRoomID
+                destinationRoom.n_to = originRoomID
             elif direction == "e":
                 self.e_to = destinationRoomID
+                destinationRoom.w_to = originRoomID
             elif direction == "w":
                 self.w_to = destinationRoomID
+                destinationRoom.e_to = originRoomID
             else:
                 print("Invalid direction")
                 return
+            # setattr(self, f"{direction}_to", connecting_room)
+            # setattr(connecting_room, f"{reverse_dir}_to", self)
+            destinationRoom.save()
             self.save()
     def playerNames(self, currentPlayerID):
         return [p.user.username for p in Player.objects.filter(currentRoom=self.id) if p.id != int(currentPlayerID)]
