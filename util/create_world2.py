@@ -154,10 +154,13 @@ class World:
         print(str)
 
 w = World()
-w.generate_world(10,10, 50)
+w.generate_world(10,10, 100)
 w.print_rooms()
 
-# players=Player.objects.all()
-# for p in players:
-#   p.currentRoom=r_outside.id
-#   p.save()
+players=Player.objects.all()
+for p in players:
+  p.currentRoom=w.start_room
+  p.save()
+print(players, 'players')
+
+
