@@ -161,7 +161,7 @@ class World:
         print(str)
 
 w = World()
-w.generate_world(25,10, 250)
+w.generate_world(10,25, 250)
 w.print_rooms()
 
 players=Player.objects.all()
