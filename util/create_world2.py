@@ -17,12 +17,12 @@ class World:
 
     def generate_blank_matrix(self, size_x, size_y):
         
-        self.grid = [None] * size_y
-        self.width = size_x
-        self.height = size_y 
+        self.grid = [None] * size_x
+        self.width = size_y
+        self.height = size_x 
 
         for i in range( len(self.grid) ):
-            self.grid[i] = [None] * size_x
+            self.grid[i] = [None] * size_y
         
     def start_room(self, start_x, start_y):
         start_room = Room(id=1, title='start_room', 
@@ -161,7 +161,7 @@ class World:
         print(str)
 
 w = World()
-w.generate_world(10,10, 100)
+w.generate_world(25,10, 250)
 w.print_rooms()
 
 players=Player.objects.all()
