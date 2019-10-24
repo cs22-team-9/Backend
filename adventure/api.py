@@ -38,8 +38,8 @@ def move(request):
     player = request.user.player
     player_id = player.id
     player_uuid = player.uuid
-    # data = json.loads(request.data)
-    direction = request.data['direction']
+    data = json.loads(request.body)
+    direction = data['direction']
     room = player.room()
     nextRoomID = None
     if direction == "n":
