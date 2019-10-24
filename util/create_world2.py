@@ -84,10 +84,10 @@ class World:
                 direction = 's'
             elif dir_roll == 2:
                 y_val += 1
-                direction = 'e'
+                direction = 'w'
             else:
                 y_val -=1
-                direction = 'w'
+                direction = 'e'
 
             if 0 <= x_val < size_x and 0 <= y_val < size_y:
                 if self.grid[x_val][y_val] is None:    
